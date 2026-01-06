@@ -1,132 +1,225 @@
 @extends('layouts.app')
 
 @section('title-page')
-    Guru
+    Manajemen Guru
 @endsection
 
 @section('breadcrumbs')
-<ol class="breadcrumb float-sm-right">
-    <li class="breadcrumb-item"><a href="{{ route('admin./') }}">Beranda</a></li>
-    <li class="breadcrumb-item active">Guru</li>
-</ol>
+    <ol class="breadcrumb float-sm-right">
+        <li class="breadcrumb-item"><a href="{{ route('admin./') }}">Beranda</a></li>
+        <li class="breadcrumb-item active">Guru</li>
+    </ol>
 @endsection
 
 @section('content')
-@if(Session::has('flash_message'))
-<script type="text/javascript">
-    Swal.fire("Berhasil!","{{ Session('flash_message') }}", "success");
-</script>
-@endif
-<div class="row">
-    <!-- Left col -->
-    <div class="col-md-12">
-    <!-- MAP & BOX PANE -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Guru</h3>
+    @if(Session::has('flash_message'))
+        <script type="text/javascript">
+            Swal.fire({
+                title: "Berhasil!",
+                text: "{{ Session('flash_message') }}",
+                icon: "success",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        </script>
+    @endif
 
-                <div class="card-tools">
-                    <a href="{{ route('admin.guru.create') }}">
-                        <button type="button" class="btn btn-sm btn-success">
-                            Tambah
-                        </button>
-                    </a>
-                </div>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-                <div class="d-flex justify-content-end">
-                    <form action="{{ route('admin.guru') }}">
-                        <div class="form-group">
-                            <input type="text" name="q_nama" value="{{ $q_nama }}" class="form-control form-control-sm" style="width: 200px" placeholder="Cari">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h5 class="mb-0 text-dark font-weight-bold">
+                                <i class="fas fa-chalkboard-teacher text-primary mr-2"></i>Daftar Guru
+                            </h5>
                         </div>
-                    </form>
+                        <div class="col-auto">
+                            <a href="{{ route('admin.guru.create') }}" class="btn btn-primary btn-sm px-3 shadow-sm">
+                                <i class="fas fa-plus mr-1"></i> Tambah Guru
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="table-responsive">
-                    <!-- Projects table -->
-                    <table class="table align-items-center table-flush">
-                      <thead class="thead-light">
-                        <tr>
-                          <th scope="col">#</th>
-                          <th scope="col">NIP</th>
-                          <th scope="col">Nama</th>
-                          <th scope="col">Alamat</th>
-                          <th scope="col">No HP</th>
-                          <th scope="col">Jabatan</th>
-                          <th scope="col">Aksi</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @if (count($guru) === 0)
-                        <tr>
-                            <td colspan="8" style="text-align:center">
-                                @if ($q_nama == "")
-                                    <span>Data Kosong</span>
-                                @else
-                                    <span>Kriteria yang anda cari tidak sesuai</span>
-                                @endif
-                            </td>
-                        </tr>
-                        @endif
-            
-                        @foreach ($guru as $data_guru)
-                        <tr>
-                            <td>{{ $loop->iteration + $skipped }}</td>
-                            <td>{{ $data_guru->nip }}</td>
-                            <td>{{ $data_guru->nama }}</td>
-                            <td>{{ $data_guru->alamat }}</td>
-                            <td>{{ $data_guru->no_hp }}</td>
-                            <td>{{ $data_guru->jabatan->name }}</td>
-                            <td>
-                                <a href="{{ route('admin.guru.edit', $data_guru->id) }}">
-                                    <button class="btn btn-warning btn-sm">Ubah</button>
-                                </a>
-                                <form onsubmit="deleteThis(event)" action="{{ route('admin.guru.delete') }}" method="POST" style="display:inline-block">
-                                    {{ csrf_field() }} {{ method_field('DELETE') }}
-                                    <input type="hidden" name="id" value="{{ $data_guru->id }}">
-                                    <button class="btn btn-danger btn-sm">Hapus</button>
+
+                <div class="card-body p-0">
+                    <div class="px-4 py-3 border-bottom bg-light">
+                        <div class="row">
+                            <div class="col-md-4 ml-auto">
+                                <form action="{{ route('admin.guru') }}" method="GET">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" name="q_nama" value="{{ $q_nama }}"
+                                            class="form-control border-0 shadow-sm" placeholder="Cari nama atau NIP...">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-white border-0 shadow-sm" type="submit">
+                                                <i class="fas fa-search text-muted"></i>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </form>
-                            </td>
-                        </tr>
-                        @endforeach
-                      </tbody>
-                    </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-muted">
+                                <tr>
+                                    <th class="border-0 px-4 py-3 text-uppercase small font-weight-bold" width="80px">#</th>
+                                    <th class="border-0 py-3 text-uppercase small font-weight-bold">Info Guru</th>
+                                    <th class="border-0 py-3 text-uppercase small font-weight-bold">NIP</th>
+                                    <th class="border-0 py-3 text-uppercase small font-weight-bold">Jabatan</th>
+                                    <th class="border-0 py-3 text-uppercase small font-weight-bold">No HP</th>
+                                    <th class="border-0 px-4 py-3 text-uppercase small font-weight-bold text-right"
+                                        width="180px">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (count($guru) === 0)
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <div class="py-3">
+                                                <i class="fas fa-search fa-3x text-muted mb-3 opacity-25"></i>
+                                                <p class="text-muted font-italic mb-0">
+                                                    @if ($q_nama == "")
+                                                        Tidak ada data guru ditemukan.
+                                                    @else
+                                                        Kriteria pencarian "{{ $q_nama }}" tidak ditemukan.
+                                                    @endif
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
+
+                                @foreach ($guru as $data_guru)
+                                    <tr>
+                                        <td class="px-4 py-3 text-muted">{{ $loop->iteration + $skipped }}</td>
+                                        <td class="py-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-circle-sm bg-light-primary text-primary mr-3">
+                                                    {{ substr($data_guru->nama, 0, 1) }}
+                                                </div>
+                                                <div>
+                                                    <span
+                                                        class="font-weight-medium text-dark d-block">{{ $data_guru->nama }}</span>
+                                                    <small class="text-muted">{{ $data_guru->alamat }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3 text-muted small">{{ $data_guru->nip }}</td>
+                                        <td class="py-3">
+                                            <span
+                                                class="badge badge-light border px-3 py-1 text-dark">{{ $data_guru->jabatan->name }}</span>
+                                        </td>
+                                        <td class="py-3 text-muted small">{{ $data_guru->no_hp }}</td>
+                                        <td class="px-4 py-3 text-right">
+                                            <div class="btn-group shadow-sm">
+                                                <a href="{{ route('admin.guru.edit', $data_guru->id) }}"
+                                                    class="btn btn-white btn-sm border-0" title="Ubah">
+                                                    <i class="fas fa-edit text-warning"></i>
+                                                </a>
+                                                <form onsubmit="deleteThis(event)" action="{{ route('admin.guru.delete') }}"
+                                                    method="POST" style="display:inline-block">
+                                                    {{ csrf_field() }} {{ method_field('DELETE') }}
+                                                    <input type="hidden" name="id" value="{{ $data_guru->id }}">
+                                                    <button type="submit" class="btn btn-white btn-sm border-0" title="Hapus">
+                                                        <i class="fas fa-trash text-danger"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="card-footer">
-                    {{ $guru->appends(['q_nama' => $q_nama])->links() }}
+
+                <div class="card-footer bg-white py-3 border-top-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="small text-muted">
+                            Menampilkan {{ count($guru) }} data dari total {{ $guru->total() }}
+                        </div>
+                        <div>
+                            {{ $guru->appends(['q_nama' => $q_nama])->links() }}
+                        </div>
+                    </div>
                 </div>
             </div>
-            <!-- /.card-body -->
         </div>
     </div>
-    <!-- /.col -->
-</div>
+
+    <style>
+        .table td,
+        .table th {
+            vertical-align: middle;
+        }
+
+        .bg-light-primary {
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+
+        .avatar-circle-sm {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .btn-white {
+            background-color: #fff;
+            color: #444;
+        }
+
+        .btn-white:hover {
+            background-color: #f8f9fa;
+            color: #222;
+        }
+
+        .shadow-sm {
+            box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
+        }
+
+        .card {
+            border-radius: 12px;
+        }
+
+        .card-header {
+            border-top-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 123, 255, 0.02);
+        }
+
+        .opacity-25 {
+            opacity: 0.25;
+        }
+    </style>
 @endsection
 
 @section('footer-scripts')
-<script type="text/javascript">
-  function deleteThis(e){
-      e.preventDefault();
-      Swal.fire({
-      title: "<div style='font-size:20px'>Apakah anda yakin?</div>",
-      html: "<div style='font-size:15px'>Data akan dihapus secara permanen!</div>",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Ya',
-      cancelButtonText: 'Batal'
-      })
-      .then((res) => {
-          if (res.isConfirmed) {
-              e.target.submit();
-              swal("Data telah dihapus!", {
-              icon: "success",
-              });
-          }
-      });
-
-      return false;
-  }
-</script>
+    <script type="text/javascript">
+        function deleteThis(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: "Hapus Guru?",
+                text: "Data guru akan dihapus secara permanen!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            })
+                .then((res) => { if (res.isConfirmed) { e.target.submit(); } });
+        }
+    </script>
 @endsection
