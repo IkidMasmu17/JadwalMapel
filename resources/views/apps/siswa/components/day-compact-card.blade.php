@@ -38,7 +38,8 @@
                         </div>
                         @if($data->jamPelajaran->status == "Belajar")
                             <div class="subject-name font-weight-bold text-dark mb-1">
-                                {{ $data->guruMataPelajaran->mataPelajaran->nama }}</div>
+                                {{ $data->guruMataPelajaran->mataPelajaran->nama }}
+                            </div>
                             <div class="teacher-name extra-small text-muted">
                                 <i class="fas fa-chalkboard-teacher mr-1"></i>{{ $data->guruMataPelajaran->guru->nama }}
                             </div>
